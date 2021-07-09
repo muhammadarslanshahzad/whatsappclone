@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 
 import SidebarChat from './SidebarChat';
 
@@ -7,11 +7,18 @@ import { IconButton, Avatar } from '@material-ui/core';
 import { DonutLarge, Chat, MoreVert, SearchOutlined } from '@material-ui/icons';
 
 
-function sidebar() {
+function Sidebar({messages}) {
+
+    const [seed, setSeed] = useState("");
+    
+    useEffect(()=>{
+        setSeed(Math.floor(Math.random()*6000));
+    },[])
+
     return (
         <div className="sidebar">
             <div className="sidebar__header">                
-                <Avatar src="https://image.shutterstock.com/image-vector/young-man-avatar-character-260nw-661669825.jpg"/>
+                <Avatar src= {`https://avatars.dicebear.com/api/human/:${seed}.svg`}/>
                 <div className="sidebar__headerRight">
                     <IconButton>
                         <DonutLarge />
@@ -33,14 +40,15 @@ function sidebar() {
             </div>
 
             <div className="sidebar__chats">
-                <SidebarChat />
-                <SidebarChat />
-                <SidebarChat />
-                <SidebarChat />
+                {messages.map((message, id)=>{
+                        return (
+                            <SidebarChat message={message} key={id}/>
+                        )
+                })}
             </div>
 
         </div>    
     )
 }
 
-export default sidebar
+export default Sidebar

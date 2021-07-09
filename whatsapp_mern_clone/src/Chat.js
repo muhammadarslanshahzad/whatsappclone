@@ -1,16 +1,40 @@
-import React from 'react'
+import React,{useEffect, useState} from 'react'
 import './Chat.css'
 import { Avatar, IconButton } from '@material-ui/core'
-import { SearchOutlined, AttachFileOutlined, MoreVert, InsertEmoticon } from '@material-ui/icons'
+import { SearchOutlined, AttachFileOutlined, MoreVert, InsertEmoticon, Mic, Send } from '@material-ui/icons'
+import axios from './axios'
 
-function Chat() {
+function Chat({messages}) {
+
+    const [input, setInput] = useState("");
+    const [seed, setSeed]=useState("");
+
+    const name= "MAS"
+
+    const sendMessage = async (e)=>{
+        e.preventDefault();
+
+        axios.post('/api/v1/messages/new',{
+            message: input,
+            name: "MAS",
+            timeStamp: "Just now!",
+            received: true,
+        });
+
+        setInput('');
+    }
+
+    useEffect(()=>{
+        setSeed("100");
+    },[])
+
     return (
         <div className="chat">
             <div className="chat__header">
-                <Avatar />
+                <Avatar src={`https://avatars.dicebear.com/api/human/:${seed}.svg`} />
 
                 <div className="chat__headerInfo">
-                    <h3>Room Name</h3>
+                    <h3>{name}</h3>
                     <p>last seen at 00:00</p>
                 </div>
 
@@ -28,23 +52,13 @@ function Chat() {
             </div>
 
             <div className="chat__body">
-                <p className="chat__message">
-                    <span className="chat__name">Arslan</span>
-                    this is a message
-                    <span className="chat__timestamp">{new Date().toUTCString()}</span>
-                </p>
-                
-                <p className="chat__message chat__receiver">
-                    <span className="chat__name">Arslan</span>
-                    this is a message
-                    <span className="chat__timestamp">{new Date().toUTCString()}</span>
-                </p>
-                
-                <p className="chat__message">
-                    <span className="chat__name">Arslan</span>
-                    this is a message
-                    <span className="chat__timestamp">{new Date().toUTCString()}</span>
-                </p>
+                {messages.map((message, id)=>{
+                   return( <p className={`chat__message  ${message.received && "chat__receiver" }`} key={id} >
+                        <span className="chat__name">{message.name}</span>
+                        {message.message}
+                        <span className="chat__timestamp">{message.timeStamp}</span>
+                    </p>)
+                })}
             </div>
 
             <div className="chat__footer">
@@ -52,9 +66,14 @@ function Chat() {
                     <InsertEmoticon />
                 </IconButton>
                 <form>
-                    <input placeholder="types a message here" type="text"/>
-                    <button  type="submit">Send</button>
+                    <input value={input} onChange={(e)=>setInput(e.target.value)}  placeholder="types a message here" type="text"/>
+                    <button  type="submit" onClick={sendMessage}>
+                        <Send />
+                    </button>
                 </form>
+                <IconButton>
+                    <Mic />
+                </IconButton>
             </div>
         </div>
     )
